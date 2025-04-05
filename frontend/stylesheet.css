@@ -1,0 +1,54 @@
+/* https://coolors.co/222222-ffffff-4b4e6d-84dcc6-95a3b3 */
+
+body {
+    background-color: #222222;
+}
+
+.result {
+    display: block;
+}
+
+#search_controls {
+    margin: 0 auto;
+    margin-top: 5%;
+    width: 500px;
+    display: flex;
+}
+
+#search_controls input {
+    display: block;
+}
+
+#search_field {
+    width: 80%;
+}
+
+#search_button {
+    margin-left: 2%;
+    width: 18%;
+}
+
+#search_results {
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+}
+
+#search_results a{
+    text-decoration: none;
+}
+
+#search_results a:link {
+    color: #84dcc6;
+}
+
+#search_results a:visited {
+    color: #95a3b3;
+}
+
+#search_results a:hover {
+    color: #a4fce6;
+    text-decoration: underline;
+}
+
