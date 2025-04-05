@@ -1,8 +1,40 @@
 #include "tokenizer.h"
-#include <iostream>
+#include <cctype>
 
-Tokenizer::Tokenizer()
-  : my_var(0) {
+Tokenizer::Tokenizer(std::string &source)
+  : it_(source.begin()), end_(source.end()), currToken_("") {
 
-  std::cout << "Tokenizer created!" << std::endl;
+}
+
+bool Tokenizer::nextToken() {
+  while (isWhitespace()) {
+    it_++;
+
+    if (it_ == end_)
+      return false;
+  }
+
+  extractToken();
+  return true;
+}
+
+std::string Tokenizer::currToken() {
+  return currToken_;
+}
+
+void Tokenizer::extractToken() {
+  std::string result {""};
+  while (!isWhitespace()) {
+    result += *it_;
+    it_++;
+  }
+
+  currToken_ = result;
+}
+
+bool Tokenizer::isWhitespace() {
+  if (std::isspace(*it_) != 0)
+    return true;
+
+  return false;
 }

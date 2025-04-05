@@ -3,7 +3,7 @@ GTEST_DIR=$(ROOT_DIR)/extlibs/googletest
 BIN_DIR=bin
 
 CXXFLAGS=-I$(INC_DIR) -I$(GTEST_DIR)/googletest/include -Wall -Wextra
-LDFLAGS=-L$(GTEST_DIR)/build/lib -lgtest
+LDFLAGS=-L$(GTEST_DIR)/build/lib -lgtest -L$(LIB_DIR) -lindexer
 
 .PHONY: $(BIN_DIR) clean_test
 all: test
@@ -11,7 +11,7 @@ all: test
 test: $(BIN_DIR)/tokenizerTests
 
 $(BIN_DIR)/tokenizerTests: tokenizerTests.o $(BIN_DIR)
-	$(CXX) -o $@ $(LDFLAGS) tokenizerTests.o $(GTEST_DIR)/build/lib/libgtest.a;
+	$(CXX) -o $@ tokenizerTests.o $(LDFLAGS)
 
 tokenizerTests.o: tokenizerTests.cpp
 	$(CXX) $(CXXFLAGS) -c $^;

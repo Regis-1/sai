@@ -3,24 +3,28 @@
 
 ROOT_DIR=$(shell pwd)
 INC_DIR=$(ROOT_DIR)/include
+LIB_DIR=$(ROOT_DIR)/lib
 
 export ROOT_DIR
 export INC_DIR
+export LIB_DIR
 
-all: search_engine
+all: libindexer test
 
-.PHONY: search_engine test cleanengine cleantest
-search_engine:
-	@make -C src $@;
-	@echo "Successfully compiled search engine.";
+.PHONY:  clean_indexer clean_test test lib/libindexer.a
+libindexer: lib/libindexer.a
+	@echo "Successfully compiled indexer.";
+
+lib/libindexer.a:
+	@make -C src libindexer.a;
 
 test:
 	@make -C test $@;
 	@echo "Successfully compiled test to test/bin directory.";
 
-clean: clean_engine clean_test
+clean: clean_indexer clean_test
 
-clean_engine:
+clean_indexer:
 	@make -C src $@;
 
 clean_test:
