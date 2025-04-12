@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 enum class TokenType {
   Null,
@@ -19,19 +20,22 @@ struct Token {
 
 class Tokenizer {
 public:
-  Tokenizer(std::string &source);
+  explicit Tokenizer(std::string &source);
+  explicit Tokenizer(std::filesystem::path &path);
 
   bool nextToken();
-  Token currToken();
+  Token currToken() const;
+  bool isFileLoaded() const;
 
 private:
   std::string::iterator it_;
   std::string::iterator end_;
+  std::string fileContent_;
   
   Token currToken_;
 
   void extractToken();
-  bool isWhitespace();
+  bool isWhitespace() const;
 
   Token parseContent();
   Token parseTag();

@@ -1,9 +1,19 @@
 #include "tokenizer.h"
 #include "gtest/gtest.h"
 
-#include <string>
-
 void testTokenEquality(Token&, Token&);
+int testTokenArray(Tokenizer&, Token*);
+
+namespace {
+  Token expectedSimpleToken[11] {
+    {TokenType::DocType, "html"},
+    {TokenType::HtmlBegin, ""}, {TokenType::HeadBegin, ""},
+    {TokenType::HeadEnd, ""}, {TokenType::BodyBegin, "class=\"mc\""},
+    {TokenType::ParagBegin, ""}, {TokenType::Content, "hello"},
+    {TokenType::Content, "world!"}, {TokenType::ParagEnd, ""},
+    {TokenType::BodyEnd, ""}, {TokenType::HtmlEnd, ""}
+  };
+}
 
 TEST(Tokenizer, nextTokenTest) {
   std::string testLine {" hold My beer    "};
@@ -23,6 +33,17 @@ TEST(Tokenizer, nextTokenTest) {
 
   ASSERT_FALSE(t.nextToken());
 }
+
+TEST(HtmlTokenize, tokenizeHtmlFileTest) {
+  std::filesystem::path filePath {"./test/simpleHtml.html"};
+
+  Tokenizer t(filePath);
+
+  ASSERT_TRUE(t.isFileLoaded()) << "ERROR: File wasn't loaded correctly";
+  int i {testTokenArray(t, expectedSimpleToken)};
+  EXPECT_EQ(i, 11);
+}
+
 
 TEST(HtmlTokenize, singleHtmlTagTest) {
   std::string testHtml {"<!DOCTYPE html>"};
@@ -45,24 +66,9 @@ TEST(HtmlTokenize, complexHtmlTagTest) {
   </body>
 </html>)"};
 
-  Token expectedToken[11] {
-    {TokenType::DocType, "html"},
-    {TokenType::HtmlBegin, ""}, {TokenType::HeadBegin, ""},
-    {TokenType::HeadEnd, ""}, {TokenType::BodyBegin, "class=\"mc\""},
-    {TokenType::ParagBegin, ""}, {TokenType::Content, "hello"},
-    {TokenType::Content, "world!"}, {TokenType::ParagEnd, ""},
-    {TokenType::BodyEnd, ""}, {TokenType::HtmlEnd, ""}
-  };
-
   Tokenizer t(testHtml);
 
-  Token tk;
-  int i {0};
-  while (t.nextToken()) {
-    tk = t.currToken();
-    testTokenEquality(tk, expectedToken[i]);
-    i++;
-  }
+  int i {testTokenArray(t, expectedSimpleToken)};
 
   EXPECT_EQ(i, 11);
 }
@@ -75,4 +81,16 @@ int main(int argc, char **argv) {
 void testTokenEquality(Token &got, Token &expected) {
   EXPECT_EQ(got.type, expected.type);
   EXPECT_EQ(got.value, expected.value);
+}
+
+int testTokenArray(Tokenizer &t, Token *expArr) {
+  Token tk;
+  int i {0};
+  while (t.nextToken()) {
+    tk = t.currToken();
+    testTokenEquality(tk, expArr[i]);
+    i++;
+  }
+
+  return i;
 }

@@ -1,11 +1,31 @@
 #include "tokenizer.h"
 #include <cctype>
 #include <algorithm>
+#include <fstream>
+#include <iterator>
 
 Tokenizer::Tokenizer(std::string &source)
-  : it_(source.begin()), end_(source.end()),
+  : it_(source.begin()), end_(source.end()), fileContent_(),
     currToken_({TokenType::Null, ""}) {
 
+}
+
+Tokenizer::Tokenizer(std::filesystem::path &path)
+  : fileContent_("") {
+
+  std::ifstream fd(path, std::ios::in | std::ios::binary);
+
+  if (!fd.is_open())
+    return;
+
+  const auto fileSize {std::filesystem::file_size(path)};
+  fileContent_.resize(fileSize);
+  fd.read(fileContent_.data(), fileSize);
+
+  fd.close();
+
+  it_ = fileContent_.begin();
+  end_ = fileContent_.end();
 }
 
 bool Tokenizer::nextToken() {
@@ -20,7 +40,7 @@ bool Tokenizer::nextToken() {
   return true;
 }
 
-Token Tokenizer::currToken() {
+Token Tokenizer::currToken() const {
   return currToken_;
 }
 
@@ -31,11 +51,19 @@ void Tokenizer::extractToken() {
     currToken_ = parseContent();
 }
 
-bool Tokenizer::isWhitespace() {
+bool Tokenizer::isWhitespace() const {
   if (std::isspace(*it_) != 0)
     return true;
 
   return false;
+}
+
+bool Tokenizer::isFileLoaded() const {
+  if (fileContent_ == "") {
+    return false;
+  }
+  
+  return true;
 }
 
 Token Tokenizer::parseContent() {
