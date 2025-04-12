@@ -5,7 +5,11 @@
 enum class TokenType {
   Null,
   Content,
-  DocType
+  DocType,
+  HtmlBegin, HtmlEnd,
+  ParagBegin, ParagEnd,
+  BodyBegin, BodyEnd,
+  HeadBegin, HeadEnd
 };
 
 struct Token {

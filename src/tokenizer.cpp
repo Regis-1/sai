@@ -42,7 +42,7 @@ Token Tokenizer::parseContent() {
   std::string value {""};
   
   while (!isWhitespace() && *it_ != '<') {
-    value += *it_;
+    value += std::tolower(*it_);
 
     it_++;
     if (it_ == end_)
@@ -56,39 +56,47 @@ Token Tokenizer::parseTag() {
   std::string typeWord {""};
 
   while (!isWhitespace() && *it_ != '>') {
-    typeWord += *it_;
+    typeWord += std::tolower(*it_);
 
     it_++;
     if (it_ == end_)
       break;
   }
 
-  std::transform(typeWord.begin(), typeWord.end(), typeWord.begin(),
-		 [](unsigned char c){ return std::tolower(c); }
-		);
-  
   TokenType type = detectType(typeWord);
   std::string value {""};
 
-  while (true) {
+  if (*it_ != '>') {
     it_++;
-    
-    if (it_ == end_ || *it_ == '>')
-      break;
-    
-    value += *it_;
+    while (it_ != end_ && *it_ != '>') {
+      value += *it_;
+      it_++;
+    }
   }
 
-  if (*it_ == '>')
-    it_++;
-
+  it_++;
   return {type, value};
 }
 
 TokenType Tokenizer::detectType(std::string &tw) {
-  if (tw == "<!doctype") {
+  if (tw == "<!doctype")
     return TokenType::DocType;
-  }
+  else if (tw == "<html")
+    return TokenType::HtmlBegin;
+  else if (tw == "</html")
+    return TokenType::HtmlEnd;
+  else if (tw == "<p")
+    return TokenType::ParagBegin;
+  else if (tw == "</p")
+    return TokenType::ParagEnd;
+  else if (tw == "<body")
+    return TokenType::BodyBegin;
+  else if (tw == "</body")
+    return TokenType::BodyEnd;
+  else if (tw == "<head")
+    return TokenType::HeadBegin;
+  else if (tw == "</head")
+    return TokenType::HeadEnd;
   
   return TokenType::Null;
 }
