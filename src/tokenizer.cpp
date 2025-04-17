@@ -29,7 +29,7 @@ Tokenizer::Tokenizer(std::filesystem::path &path)
 }
 
 bool Tokenizer::nextToken() {
-  while (isWhitespace()) {
+  while (isWhitespace() || isOmitPunctuation()) {
     it_++;
   }
 
@@ -58,6 +58,15 @@ bool Tokenizer::isWhitespace() const {
   return false;
 }
 
+bool Tokenizer::isOmitPunctuation() const {
+  const unsigned int c {(unsigned int)*it_};
+  if ((33 <= c && c < 37) || (39 <= c && c < 45) ||
+      (46 <= c && c < 48) || (63 <= c && c < 65))
+    return true;
+
+  return false;
+}
+
 bool Tokenizer::isFileLoaded() const {
   if (fileContent_ == "") {
     return false;
@@ -69,7 +78,7 @@ bool Tokenizer::isFileLoaded() const {
 Token Tokenizer::parseContent() {
   std::string value {""};
   
-  while (!isWhitespace() && *it_ != '<') {
+  while (!isWhitespace() && !isOmitPunctuation() && *it_ != '<') {
     value += std::tolower(*it_);
 
     it_++;

@@ -8,12 +8,18 @@ LDFLAGS=-L$(GTEST_DIR)/build/lib -lgtest -L$(LIB_DIR) -lindexer
 .PHONY: $(BIN_DIR) clean_test
 all: test
 
-test: $(BIN_DIR)/tokenizerTests
+test: $(BIN_DIR)/tokenizerTests $(BIN_DIR)/indexerTests
 
 $(BIN_DIR)/tokenizerTests: tokenizerTests.o $(BIN_DIR)
-	$(CXX) -o $@ tokenizerTests.o $(LDFLAGS)
+	$(CXX) -o $@ tokenizerTests.o $(LDFLAGS);
 
 tokenizerTests.o: tokenizerTests.cpp
+	$(CXX) $(CXXFLAGS) -c $^;
+
+$(BIN_DIR)/indexerTests: indexerTests.o $(BIN_DIR)
+	$(CXX) -o $@ indexerTests.o $(LDFLAGS);
+
+indexerTests.o: indexerTests.cpp
 	$(CXX) $(CXXFLAGS) -c $^;
 
 $(BIN_DIR):

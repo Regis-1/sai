@@ -10,13 +10,13 @@ namespace {
     {TokenType::HtmlBegin, ""}, {TokenType::HeadBegin, ""},
     {TokenType::HeadEnd, ""}, {TokenType::BodyBegin, "class=\"mc\""},
     {TokenType::ParagBegin, ""}, {TokenType::Content, "hello"},
-    {TokenType::Content, "world!"}, {TokenType::ParagEnd, ""},
+    {TokenType::Content, "cmath"}, {TokenType::ParagEnd, ""},
     {TokenType::BodyEnd, ""}, {TokenType::HtmlEnd, ""}
   };
 }
 
 TEST(Tokenizer, nextTokenTest) {
-  std::string testLine {" hold My beer    "};
+  std::string testLine {" hold, My beer.    "};
   Token expectedToken[3] {
     {TokenType::Content, "hold"},
     {TokenType::Content, "my"},
@@ -62,7 +62,7 @@ TEST(HtmlTokenize, complexHtmlTagTest) {
   <head>
   </head>
   <body class="mc">
-    <p>Hello world!</p>
+    <p>Hello &lt;cmath&gt!</p>
   </body>
 </html>)"};
 

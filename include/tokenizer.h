@@ -36,6 +36,7 @@ private:
 
   void extractToken();
   bool isWhitespace() const;
+  bool isOmitPunctuation() const;
 
   Token parseContent();
   Token parseTag();
