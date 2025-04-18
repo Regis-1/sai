@@ -45,73 +45,110 @@ Token Tokenizer::currToken() const {
 }
 
 void Tokenizer::extractToken() {
-  if (*it_ == '<')
+  const unsigned char c {static_cast<unsigned char>(*it_)};
+  if (c == '<')
     currToken_ = parseTag();
   else
     currToken_ = parseContent();
 }
 
 bool Tokenizer::isWhitespace() const {
-  if (std::isspace(*it_) != 0)
-    return true;
-
-  return false;
+  return (std::isspace(*it_) != 0);
 }
 
 bool Tokenizer::isOmitPunctuation() const {
-  const unsigned int c {(unsigned int)*it_};
-  if ((33 <= c && c < 37) || (39 <= c && c < 45) ||
-      (46 <= c && c < 48) || (63 <= c && c < 65))
+  const unsigned char c {static_cast<unsigned char>(*it_)};
+  return std::ispunct(c) &&
+    (c != '&' && c != '<' && c != '-');
+}
+
+bool Tokenizer::isHtmlEntity() const {
+  auto it = it_;
+  std::string word {""};
+  unsigned char c {static_cast<unsigned char>(*it)};
+
+  for (int i {0}; i < 3; ++i) {
+    it++;
+    if (it == end_)
+      return false;
+    
+    c = static_cast<unsigned char>(*it);
+    word += c;
+  }
+
+  if (word == "gt;" || word == "lt;")
+    return true;
+
+  it++;
+  if (it == end_)
+    return false;
+  
+  c = static_cast<unsigned char>(*it);
+  word += c;
+
+  if (word == "amp;")
     return true;
 
   return false;
 }
 
 bool Tokenizer::isFileLoaded() const {
-  if (fileContent_ == "") {
-    return false;
-  }
-  
-  return true;
+  return !(fileContent_ == "");
 }
 
 Token Tokenizer::parseContent() {
+  unsigned char c {static_cast<unsigned char>(*it_)};
   std::string value {""};
   
-  while (!isWhitespace() && !isOmitPunctuation() && *it_ != '<') {
-    value += std::tolower(*it_);
+  while (!isWhitespace() && !isOmitPunctuation()) {
+    if (c == '&' && value != "" && isHtmlEntity())
+      return {TokenType::Content, value};
+
+    value += std::tolower(c);
 
     it_++;
     if (it_ == end_)
       break;
+
+    c = static_cast<unsigned char>(*it_);
   }
 
   return {TokenType::Content, value};
 }
 
 Token Tokenizer::parseTag() {
+  unsigned char c {static_cast<unsigned char>(*it_)};
   std::string typeWord {""};
 
-  while (!isWhitespace() && *it_ != '>') {
-    typeWord += std::tolower(*it_);
+  while (!isWhitespace() && c != '>') {
+    typeWord += std::tolower(c);
 
     it_++;
     if (it_ == end_)
-      break;
+      return {TokenType::Null, ""};
+    
+    c = static_cast<unsigned char>(*it_);
   }
 
   TokenType type = detectType(typeWord);
   std::string value {""};
 
-  if (*it_ != '>') {
+  if (c != '>') {
     it_++;
-    while (it_ != end_ && *it_ != '>') {
-      value += *it_;
+    c = static_cast<unsigned char>(*it_);
+    while (it_ != end_ && c != '>') {
+      value += c;
       it_++;
+      if (it_ != end_)
+	c = static_cast<unsigned char>(*it_);
+      else
+	break;
     }
   }
 
-  it_++;
+  if (it_ != end_)
+    it_++;
+  
   return {type, value};
 }
 

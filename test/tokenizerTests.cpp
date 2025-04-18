@@ -5,12 +5,13 @@ void testTokenEquality(Token&, Token&);
 int testTokenArray(Tokenizer&, Token*);
 
 namespace {
-  Token expectedSimpleToken[11] {
+  Token expectedSimpleToken[13] {
     {TokenType::DocType, "html"},
     {TokenType::HtmlBegin, ""}, {TokenType::HeadBegin, ""},
     {TokenType::HeadEnd, ""}, {TokenType::BodyBegin, "class=\"mc\""},
     {TokenType::ParagBegin, ""}, {TokenType::Content, "hello"},
-    {TokenType::Content, "cmath"}, {TokenType::ParagEnd, ""},
+    {TokenType::Content, "&lt"}, {TokenType::Content, "cmath"},
+    {TokenType::Content, "&gt"}, {TokenType::ParagEnd, ""},
     {TokenType::BodyEnd, ""}, {TokenType::HtmlEnd, ""}
   };
 }
@@ -41,7 +42,7 @@ TEST(HtmlTokenize, tokenizeHtmlFileTest) {
 
   ASSERT_TRUE(t.isFileLoaded()) << "ERROR: File wasn't loaded correctly";
   int i {testTokenArray(t, expectedSimpleToken)};
-  EXPECT_EQ(i, 11);
+  EXPECT_EQ(i, 13);
 }
 
 
@@ -62,7 +63,7 @@ TEST(HtmlTokenize, complexHtmlTagTest) {
   <head>
   </head>
   <body class="mc">
-    <p>Hello &lt;cmath&gt!</p>
+    <p>Hello &lt;cmath&gt;!</p>
   </body>
 </html>)"};
 
@@ -70,7 +71,7 @@ TEST(HtmlTokenize, complexHtmlTagTest) {
 
   int i {testTokenArray(t, expectedSimpleToken)};
 
-  EXPECT_EQ(i, 11);
+  EXPECT_EQ(i, 13);
 }
 
 int main(int argc, char **argv) {
